@@ -16,7 +16,7 @@
 
 */
 /*eslint-disable*/
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { NavLink as NavLinkRRD, Link } from "react-router-dom";
 // nodejs library to set properties for components
 import PropTypes from "prop-types";
@@ -43,8 +43,12 @@ import {
   Row,
   Col,
 } from "reactstrap";
+import { AuthContext } from "contexts/AuthContext";
+import { handleLogout } from "services/handlers";
 
 const Sidebar = (props) => {
+  const { setIsAuthenticated } = useContext(AuthContext);
+
   const [collapseOpen, setCollapseOpen] = useState();
   // verifies if routeName is the one active (in browser input)
   const activeRoute = (routeName) => {
@@ -145,8 +149,11 @@ const Sidebar = (props) => {
             </DropdownToggle>
             <DropdownMenu className="dropdown-menu-arrow" right>
               <DropdownItem
-                href="/auth/login"
-                onClick={(e) => e.preventDefault()}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleLogout();
+                  setIsAuthenticated(false);
+                }}
               >
                 <i className="ni ni-user-run" />
                 <span>Logout</span>

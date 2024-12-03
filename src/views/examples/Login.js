@@ -17,6 +17,9 @@
 */
 
 // reactstrap components
+import { AuthContext } from "contexts/AuthContext";
+import { useContext, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   Card,
@@ -28,59 +31,37 @@ import {
   InputGroupText,
   InputGroup,
   Col,
+  FormFeedback,
 } from "reactstrap";
+import { handleLogin } from "services/handlers";
 
 const Login = () => {
+  const navigate = useNavigate();
+  const { setIsAuthenticated } = useContext(AuthContext);
+  const [error, setError] = useState(false);
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+
+    const response = await handleLogin(formData);
+    if (response.ok) {
+      setIsAuthenticated(true);
+      navigate("/admin/index");
+    } else {
+      setError(true);
+    }
+  }
+
   return (
     <>
       <Col lg="5" md="7">
         <Card className="bg-secondary shadow border-0">
-          {/* <CardHeader className="bg-transparent pb-5">
-            <div className="text-muted text-center mt-2 mb-3">
-              <small>Sign in with</small>
-            </div>
-            <div className="btn-wrapper text-center">
-              <Button
-                className="btn-neutral btn-icon"
-                color="default"
-                href="#pablo"
-                onClick={(e) => e.preventDefault()}
-              >
-                <span className="btn-inner--icon">
-                  <img
-                    alt="..."
-                    src={
-                      require("../../assets/img/icons/common/github.svg")
-                        .default
-                    }
-                  />
-                </span>
-                <span className="btn-inner--text">Github</span>
-              </Button>
-              <Button
-                className="btn-neutral btn-icon"
-                color="default"
-                href="#pablo"
-                onClick={(e) => e.preventDefault()}
-              >
-                <span className="btn-inner--icon">
-                  <img
-                    alt="..."
-                    src={
-                      require("../../assets/img/icons/common/google.svg")
-                        .default
-                    }
-                  />
-                </span>
-                <span className="btn-inner--text">Google</span>
-              </Button>
-            </div>
-          </CardHeader>*/}
           <CardBody className="px-lg-5 py-lg-5">
             <div className="text-center text-muted mb-4">
               <small>Sign in with credentials</small>
             </div>
-            <Form role="form">
+            <Form id="form" role="form" onSubmit={handleSubmit}>
               <FormGroup className="mb-3">
                 <InputGroup className="input-group-alternative">
                   <InputGroupAddon addonType="prepend">
@@ -89,10 +70,15 @@ const Login = () => {
                     </InputGroupText>
                   </InputGroupAddon>
                   <Input
+                    invalid={error}
+                    name="usernameoremail"
                     placeholder="Username or Email"
                     type="text"
                     autoComplete="new-email"
                   />
+                  <FormFeedback className="text-center">
+                    Invalid Credentials
+                  </FormFeedback>
                 </InputGroup>
               </FormGroup>
               <FormGroup>
@@ -103,14 +89,24 @@ const Login = () => {
                     </InputGroupText>
                   </InputGroupAddon>
                   <Input
+                    invalid={error}
+                    name="password"
                     placeholder="Password"
                     type="password"
                     autoComplete="new-password"
                   />
+                  <FormFeedback className="text-center">
+                    Invalid Credentials
+                  </FormFeedback>
                 </InputGroup>
               </FormGroup>
               <div className="text-center">
-                <Button className="my-4" color="primary" type="button">
+                <Button
+                  className="my-4"
+                  color="primary"
+                  type="submit"
+                  value="submit"
+                >
                   Sign in
                 </Button>
               </div>

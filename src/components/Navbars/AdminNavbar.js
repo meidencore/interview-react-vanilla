@@ -15,6 +15,8 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
+import { AuthContext } from "contexts/AuthContext";
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 // reactstrap components
@@ -34,9 +36,10 @@ import {
   Container,
   Media,
 } from "reactstrap";
+import { handleLogout } from "services/handlers";
 
 const AdminNavbar = (props) => {
-  const navigate = useNavigate();
+  const { setIsAuthenticated } = useContext(AuthContext);
   return (
     <>
       <Navbar className="navbar-top navbar-dark" expand="md" id="navbar-main">
@@ -83,7 +86,8 @@ const AdminNavbar = (props) => {
                 <DropdownItem
                   onClick={(e) => {
                     e.preventDefault();
-                    navigate("/auth/login");
+                    handleLogout();
+                    setIsAuthenticated(false);
                   }}
                 >
                   <i className="ni ni-user-run" />
