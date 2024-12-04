@@ -14,17 +14,24 @@ export async function handleLogin(formData) {
     ? (credentials.email = usernameOrEmail)
     : (credentials.name = usernameOrEmail);
 
-  const login = await post(LOGIN_ENDPOINT, credentials);
-  if (login.ok) {
-    const token = await login.text();
-    localStorage.setItem("Authorization", `Bearer ${token}`);
+  try {
+    const login = await post(LOGIN_ENDPOINT, credentials);
+    if (login.ok) {
+      const token = await login.text();
+      localStorage.setItem("Authorization", `Bearer ${token}`);
 
-    return { ok: true };
-  } else {
+      return { ok: true };
+    } else {
+      return {
+        ok: false,
+        status: login.status,
+        description: login.statusText,
+      };
+    }
+  } catch (error) {
     return {
       ok: false,
-      status: login.status,
-      description: login.statusText,
+      description: error.message,
     };
   }
 }

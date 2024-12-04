@@ -44,7 +44,7 @@ import {
   Col,
 } from "reactstrap";
 import { AuthContext } from "contexts/AuthContext";
-import { handleLogout } from "services/handlers";
+import { handleLogout } from "services/authHandlers";
 
 const Sidebar = (props) => {
   const { setIsAuthenticated } = useContext(AuthContext);
@@ -130,7 +130,7 @@ const Sidebar = (props) => {
               className="dropdown-menu-arrow"
               right
             >
-              <DropdownItem>Action asdasds</DropdownItem>
+              <DropdownItem>Action</DropdownItem>
               <DropdownItem>Another action</DropdownItem>
               <DropdownItem divider />
               <DropdownItem>Something else here</DropdownItem>

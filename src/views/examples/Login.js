@@ -33,7 +33,7 @@ import {
   Col,
   FormFeedback,
 } from "reactstrap";
-import { handleLogin } from "services/handlers";
+import { handleLogin } from "services/authHandlers";
 
 const Login = () => {
   const navigate = useNavigate();
