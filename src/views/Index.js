@@ -25,6 +25,9 @@ import {
   Input,
   Row,
   Col,
+  Pagination,
+  PaginationItem,
+  PaginationLink,
 } from "reactstrap";
 
 // core components
@@ -35,82 +38,52 @@ import StudentModal from "components/StudentModal";
 const Index = () => {
   const [selected, setSelected] = useState(false);
   const [searchfield, setSearchfield] = useState("");
-  const [sortBy, setSortBy] = useState("id");
-  const [order, setOrder] = useState("asc");
-  const { students, setStudents, revalidate } = useStudents();
+  const { students, revalidate, sortFields, changeSortBy, toggleOrder, order } =
+    useStudents(searchfield);
 
   function onSearchChange(event) {
     setSearchfield(event.target.value);
-  }
-
-  const filteredStudents = students.filter((student) => {
-    return student.name.toLowerCase().includes(searchfield.toLowerCase());
-  });
-
-  function updateOrder() {
-    const update = order === "asc" ? "desc" : "asc";
-    setOrder(update);
-    sort(sortBy, update);
-  }
-
-  function sort(value, order) {
-    const returnValue = order === "desc" ? 1 : -1;
-
-    setSortBy(value);
-    setStudents([
-      ...students.sort((a, b) => {
-        return a[value] > b[value] ? returnValue * -1 : returnValue;
-      }),
-    ]);
   }
 
   return (
     <>
       <Header />
       {/* Page content */}
-      {students[0] && (
-        <Row className="mt-3 mx-4" xs={4}>
-          <Col>
-            <InputGroup className="input-group-alternative">
-              <InputGroupText>
-                <i className="fas fa-search" />
-              </InputGroupText>
-              <Input
-                placeholder="Search"
-                type="text"
-                onChange={onSearchChange}
-              />
-            </InputGroup>
-          </Col>
-          <Col>
-            <Input
-              id="exampleSelect"
-              name="select"
-              type="select"
-              onChange={(e) => sort(e.target.value, order)}
-            >
-              {Object.keys(students[0]).map((entry, index) => (
+      <Row className="mt-3 mx-4" xs={4}>
+        <Col>
+          <InputGroup className="input-group-alternative">
+            <InputGroupText>
+              <i className="fas fa-search" />
+            </InputGroupText>
+            <Input placeholder="Search" type="text" onChange={onSearchChange} />
+          </InputGroup>
+        </Col>
+        <Col>
+          <Input
+            id="exampleSelect"
+            name="select"
+            type="select"
+            onChange={(e) => changeSortBy(e.target.value)}
+          >
+            {students.students[0] &&
+              sortFields.map((entry, index) => (
                 <option value={entry} key={index}>
                   Order by {entry}
                 </option>
               ))}
-            </Input>
-          </Col>
-          <Col>
-            <Button color="primary" onClick={updateOrder}>
-              Switch order ({order})
-            </Button>
-          </Col>
-          <Col>
-            <Button
-              color="success"
-              onClick={() => setSelected({ isNew: true })}
-            >
-              Create New Student
-            </Button>
-          </Col>
-        </Row>
-      )}
+          </Input>
+        </Col>
+        <Col>
+          <Button color="primary" onClick={toggleOrder}>
+            Switch order {order}
+          </Button>
+        </Col>
+        <Col>
+          <Button color="success" onClick={() => setSelected({ isNew: true })}>
+            Create New Student
+          </Button>
+        </Col>
+      </Row>
       <Container className="mt-5" fluid>
         <Table bordered hover responsive size="sm">
           <thead>
@@ -124,7 +97,7 @@ const Index = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredStudents.map((student) => {
+            {students.students.map((student) => {
               const { id, name, gender, education, age, academicYear } =
                 student;
               return (
@@ -146,6 +119,47 @@ const Index = () => {
           refresh={revalidate}
         />
       </Container>
+
+      {students.totalPages > 0 && (
+        <Container className="mt-5" fluid>
+          <Pagination size="sm">
+            <PaginationItem onClick={() => students.goto(1)}>
+              <PaginationLink first />
+            </PaginationItem>
+            <PaginationItem onClick={() => students.prevPage()}>
+              <PaginationLink previous />
+            </PaginationItem>{" "}
+            {Array.from(
+              {
+                length:
+                  students.totalPages >= 10
+                    ? 10
+                    : students.totalPages - students.currentPage + 1,
+              },
+              (_, i) => students.currentPage + i,
+            ).map((el, index) => {
+              return (
+                <PaginationItem
+                  key={index}
+                  active={students.currentPage === el ? true : false}
+                  onClick={() => students.goto(el)}
+                >
+                  <PaginationLink>{el}</PaginationLink>
+                </PaginationItem>
+              );
+            })}
+            <PaginationItem onClick={() => students.nextPage()}>
+              <PaginationLink next />
+            </PaginationItem>
+            <PaginationItem>
+              <PaginationLink
+                last
+                onClick={() => students.goto(students.totalPages)}
+              />
+            </PaginationItem>
+          </Pagination>
+        </Container>
+      )}
     </>
   );
 };
