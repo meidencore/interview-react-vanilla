@@ -25,15 +25,13 @@ import {
   Input,
   Row,
   Col,
-  Pagination,
-  PaginationItem,
-  PaginationLink,
 } from "reactstrap";
 
 // core components
 import Header from "components/Headers/Header.js";
 import { useStudents } from "hooks/useStudents";
 import StudentModal from "components/StudentModal";
+import InteractivePagination from "components/Pagination";
 
 const Index = () => {
   const [selected, setSelected] = useState(false);
@@ -119,46 +117,14 @@ const Index = () => {
           refresh={revalidate}
         />
       </Container>
-
       {students.totalPages > 0 && (
-        <Container className="mt-5" fluid>
-          <Pagination size="sm">
-            <PaginationItem onClick={() => students.goto(1)}>
-              <PaginationLink first />
-            </PaginationItem>
-            <PaginationItem onClick={() => students.prevPage()}>
-              <PaginationLink previous />
-            </PaginationItem>{" "}
-            {Array.from(
-              {
-                length:
-                  students.totalPages >= 10
-                    ? 10
-                    : students.totalPages - students.currentPage + 1,
-              },
-              (_, i) => students.currentPage + i,
-            ).map((el, index) => {
-              return (
-                <PaginationItem
-                  key={index}
-                  active={students.currentPage === el ? true : false}
-                  onClick={() => students.goto(el)}
-                >
-                  <PaginationLink>{el}</PaginationLink>
-                </PaginationItem>
-              );
-            })}
-            <PaginationItem onClick={() => students.nextPage()}>
-              <PaginationLink next />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink
-                last
-                onClick={() => students.goto(students.totalPages)}
-              />
-            </PaginationItem>
-          </Pagination>
-        </Container>
+        <InteractivePagination
+          currentPage={students.currentPage}
+          totalPages={students.totalPages}
+          next={students.nextPage}
+          prev={students.prevPage}
+          goto={students.goto}
+        />
       )}
     </>
   );
